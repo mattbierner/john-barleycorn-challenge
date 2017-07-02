@@ -3,7 +3,7 @@ import math
 
 # https://web.archive.org/web/20040202204141/www.nhtsa.dot.gov/people/injury/alcohol/bacreport.html
 
-WORDS_PER_MINUTE = 200 
+WORDS_PER_MINUTE = 200
 
 
 def CalcBAC(mBodyWeight, mPercentWater, mOuncesEtOH, mMetabolicRate, mTimeInHours):

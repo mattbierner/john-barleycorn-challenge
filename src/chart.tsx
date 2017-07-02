@@ -7,11 +7,12 @@ export interface Point {
     value: number
 }
 
-        const bisectDate = d3.bisector<Point, {}>((point: Point) => point.time).left
+const bisectDate = d3.bisector<Point, {}>((point: Point) => point.time).left
 
 
 interface CharProps {
-    data: Point[]
+    line: Point[]
+    points: Point[]
 }
 
 export default class Chart extends React.Component<CharProps, {}> {
@@ -55,8 +56,8 @@ export default class Chart extends React.Component<CharProps, {}> {
             .y((d: Point) => y(d.value))
 
 
-        x.domain(d3.extent(this.props.data, (d: Point) => d.time) as number[])
-        y.domain(d3.extent(this.props.data, (d: Point) => d.value) as number[])
+        x.domain(d3.extent(this.props.line, (d: Point) => d.time) as number[])
+        y.domain(d3.extent(this.props.line, (d: Point) => d.value) as number[])
 
         g.append('g')
             .attr('transform', 'translate(0,' + height + ')')
@@ -74,8 +75,9 @@ export default class Chart extends React.Component<CharProps, {}> {
             .attr('text-anchor', 'end')
             .text('Blood Alcohol Content')
 
+        // line
         g.append('path')
-            .datum(this.props.data)
+            .datum(this.props.line)
             .attr('fill', 'none')
             .attr('stroke', 'steelblue')
             .attr('stroke-linejoin', 'round')
@@ -83,8 +85,17 @@ export default class Chart extends React.Component<CharProps, {}> {
             .attr('stroke-width', 1.5)
             .attr('d', line)
 
+        // Points
+        g.selectAll("scatter-dots")
+            .data(this.props.points) 
+            .enter().append("svg:circle")
+            .attr("cy", (d) => y(d.value))
+            .attr("cx", (d, i) => x(this.props.points[i].time))
+            .attr("r", 2) 
+            .style("opacity", 0.6)
 
-        var focus = svg.append('g')
+        // hover
+        const focus = svg.append('g')
             .attr('class', 'focus')
             .style('display', 'none');
 
@@ -105,9 +116,9 @@ export default class Chart extends React.Component<CharProps, {}> {
             .on('mousemove', mousemove);
 
         const margin = this.margin;
-        const data = this.props.data
+        const data = this.props.line
         function mousemove(this: any) {
-            const x0 = x.invert(d3.mouse(this)[0])
+            const x0 = x.invert(d3.mouse(this)[0] - margin.left)
             const i = bisectDate(data, x0, 1)
             const d0 = data[i - 1]
             const d1 = data[i]

@@ -39,20 +39,50 @@ export default class Visualization extends React.Component<VisualizationProps, {
         return total
     }
 
-    private get data(): Point[] {
+    private get line(): Point[] {
+        const end = Math.ceil(this.props.totalWordCount / this.props.wordPerMinute)
+        
         const out: Point[] = []
-        for (let i = 0, len = Math.ceil(this.props.totalWordCount / this.props.wordPerMinute); i < len; ++i) {
-            out.push({
-                time: i,
-                value: this.compute(i)
-            })
+        out.push({ time: 0, value: 0 })
+
+        for (let i = 0; i < this.props.barleycornIndicies.length; ++i) {
+            const index = this.props.barleycornIndicies[i]
+            const start = index * (1.0 / this.props.wordPerMinute)
+            out.push({ time: start, value: this.compute(start) })
+
+            const next = this.props.barleycornIndicies[i + 1]
+            if (!next)
+                break;
+            
+            const nextStart = next * (1.0 / this.props.wordPerMinute)
+            for (let forwardStart = start + 1; forwardStart < nextStart - 1; ++forwardStart) {
+                out.push({ time: forwardStart, value: this.compute(forwardStart)})
+            }
         }
+        out.push({ time: end, value: this.compute(end) })
+
+        return out
+    }
+
+    private get points(): Point[] {
+        const out: Point[] = []
+        out.push({ time: 0, value: 0 })
+
+        for (let i = 0; i < this.props.barleycornIndicies.length; ++i) {
+            const index = this.props.barleycornIndicies[i]
+            const start = index * (1.0 / this.props.wordPerMinute)
+            out.push({ time: start, value: this.compute(start) })
+        }
+
+        const end = Math.ceil(this.props.totalWordCount / this.props.wordPerMinute)
+        out.push({ time: end, value: this.compute(end) })
+
         return out
     }
 
     render() {
         return (
-            <Chart data={this.data} />
+            <Chart line={this.line} points={this.points} />
         )
     }
 }

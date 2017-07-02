@@ -22533,18 +22533,39 @@ class Visualization extends React.Component {
         }
         return total;
     }
-    get data() {
+    get line() {
+        const end = Math.ceil(this.props.totalWordCount / this.props.wordPerMinute);
         const out = [];
-        for (let i = 0, len = Math.ceil(this.props.totalWordCount / this.props.wordPerMinute); i < len; ++i) {
-            out.push({
-                time: i,
-                value: this.compute(i)
-            });
+        out.push({ time: 0, value: 0 });
+        for (let i = 0; i < this.props.barleycornIndicies.length; ++i) {
+            const index = this.props.barleycornIndicies[i];
+            const start = index * (1.0 / this.props.wordPerMinute);
+            out.push({ time: start, value: this.compute(start) });
+            const next = this.props.barleycornIndicies[i + 1];
+            if (!next)
+                break;
+            const nextStart = next * (1.0 / this.props.wordPerMinute);
+            for (let forwardStart = start + 1; forwardStart < nextStart - 1; ++forwardStart) {
+                out.push({ time: forwardStart, value: this.compute(forwardStart) });
+            }
         }
+        out.push({ time: end, value: this.compute(end) });
+        return out;
+    }
+    get points() {
+        const out = [];
+        out.push({ time: 0, value: 0 });
+        for (let i = 0; i < this.props.barleycornIndicies.length; ++i) {
+            const index = this.props.barleycornIndicies[i];
+            const start = index * (1.0 / this.props.wordPerMinute);
+            out.push({ time: start, value: this.compute(start) });
+        }
+        const end = Math.ceil(this.props.totalWordCount / this.props.wordPerMinute);
+        out.push({ time: end, value: this.compute(end) });
         return out;
     }
     render() {
-        return (React.createElement(chart_1.default, { data: this.data }));
+        return (React.createElement(chart_1.default, { line: this.line, points: this.points }));
     }
 }
 exports.default = Visualization;
@@ -22590,8 +22611,8 @@ class Chart extends React.Component {
         const line = d3.line()
             .x((d) => x(d.time))
             .y((d) => y(d.value));
-        x.domain(d3.extent(this.props.data, (d) => d.time));
-        y.domain(d3.extent(this.props.data, (d) => d.value));
+        x.domain(d3.extent(this.props.line, (d) => d.time));
+        y.domain(d3.extent(this.props.line, (d) => d.value));
         g.append('g')
             .attr('transform', 'translate(0,' + height + ')')
             .call(d3.axisBottom(x))
@@ -22606,15 +22627,25 @@ class Chart extends React.Component {
             .attr('dy', '0.71em')
             .attr('text-anchor', 'end')
             .text('Blood Alcohol Content');
+        // line
         g.append('path')
-            .datum(this.props.data)
+            .datum(this.props.line)
             .attr('fill', 'none')
             .attr('stroke', 'steelblue')
             .attr('stroke-linejoin', 'round')
             .attr('stroke-linecap', 'round')
             .attr('stroke-width', 1.5)
             .attr('d', line);
-        var focus = svg.append('g')
+        // Points
+        g.selectAll("scatter-dots")
+            .data(this.props.points)
+            .enter().append("svg:circle")
+            .attr("cy", (d) => y(d.value))
+            .attr("cx", (d, i) => x(this.props.points[i].time))
+            .attr("r", 2)
+            .style("opacity", 0.6);
+        // hover
+        const focus = svg.append('g')
             .attr('class', 'focus')
             .style('display', 'none');
         focus.append('circle')
@@ -22631,9 +22662,9 @@ class Chart extends React.Component {
             .on('mouseout', () => { focus.style('display', 'none'); })
             .on('mousemove', mousemove);
         const margin = this.margin;
-        const data = this.props.data;
+        const data = this.props.line;
         function mousemove() {
-            const x0 = x.invert(d3.mouse(this)[0]);
+            const x0 = x.invert(d3.mouse(this)[0] - margin.left);
             const i = bisectDate(data, x0, 1);
             const d0 = data[i - 1];
             const d1 = data[i];
