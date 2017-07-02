@@ -9849,6 +9849,7 @@ class Main extends React.Component {
     }
     onDrinkChange(newDrink) {
         this.setState({ drink: newDrink });
+        console.log(newDrink.ozOfAlcohol);
     }
     onSexChange(newSex) {
         this.setState({ sexOfDrinker: newSex });
@@ -22613,11 +22614,11 @@ class Chart extends React.Component {
             .y((d) => y(d.value));
         x.domain(d3.extent(this.props.line, (d) => d.time));
         y.domain(d3.extent(this.props.line, (d) => d.value));
+        // x axis
         g.append('g')
             .attr('transform', 'translate(0,' + height + ')')
-            .call(d3.axisBottom(x))
-            .select('.domain')
-            .remove();
+            .call(d3.axisBottom(x));
+        // y axis
         g.append('g')
             .call(d3.axisLeft(y))
             .append('text')
@@ -22627,7 +22628,23 @@ class Chart extends React.Component {
             .attr('dy', '0.71em')
             .attr('text-anchor', 'end')
             .text('Blood Alcohol Content');
-        // line
+        // legal limit line
+        g.append('path')
+            .datum([{ time: 0, value: 0.08 }, { time: 9999, value: 0.08 }])
+            .attr('fill', 'none')
+            .attr('stroke', 'blue')
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-width', 1.5)
+            .attr('d', line);
+        // Dead line
+        g.append('path')
+            .datum([{ time: 0, value: 0.6 }, { time: 9999, value: 0.6 }])
+            .attr('fill', 'none')
+            .attr('stroke', 'red')
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-width', 1.5)
+            .attr('d', line);
+        // Line
         g.append('path')
             .datum(this.props.line)
             .attr('fill', 'none')
@@ -22645,7 +22662,7 @@ class Chart extends React.Component {
             .attr("r", 2)
             .style("opacity", 0.6);
         // hover
-        const focus = svg.append('g')
+        const focus = g.append('g')
             .attr('class', 'focus')
             .style('display', 'none');
         focus.append('circle')
@@ -22669,7 +22686,7 @@ class Chart extends React.Component {
             const d0 = data[i - 1];
             const d1 = data[i];
             const d = x0 - d0.time > d1.time - x0 ? d1 : d0;
-            focus.attr('transform', 'translate(' + (x(d.time) + margin.left) + ',' + (y(d.value) + margin.top) + ')');
+            focus.attr('transform', 'translate(' + x(d.time) + ',' + y(d.value) + ')');
             focus.select('text').text(d.value);
         }
     }
@@ -39674,7 +39691,27 @@ exports.drinks = [
     {
         value: '80_proof_whiskey_shot',
         label: 'a shot of 80 proof whiskey',
-        ozOfAlcohol: 1.5 * 0.4
+        ozOfAlcohol: 1.5 /*oz*/ * 0.4 /* % */
+    },
+    {
+        value: 'pint_beer',
+        label: 'a pint of beer',
+        ozOfAlcohol: 16 /*oz*/ * 0.05 /* % */
+    },
+    {
+        value: 'sip_wine',
+        label: 'a big sip of wine ',
+        ozOfAlcohol: 0.54 /*oz*/ * 0.10 /* % */
+    },
+    {
+        value: 'aquarium',
+        label: 'an aquarium of Pabst',
+        ozOfAlcohol: 128 /*oz*/ * 0.0474 /* % */
+    },
+    {
+        value: 'dry_martini',
+        label: 'a dry martini',
+        ozOfAlcohol: (1.5 /*oz*/ * 0.45 /* % */) + (1.5 /*oz*/ * 0.16 /* % */)
     }
 ];
 class DrinkSelector extends React.Component {
@@ -39741,7 +39778,7 @@ class NumberInput extends React.Component {
     onChange(e) {
         const value = +e.target.value;
         const rangedValue = Math.max(this.props.min, Math.min(this.props.max, value));
-        this.props.onChange(rangedValue);
+        this.props.onChange(value);
     }
     render() {
         return (React.createElement("input", { type: 'number', value: this.props.value, onChange: this.onChange.bind(this), min: this.props.min, max: this.props.max }));

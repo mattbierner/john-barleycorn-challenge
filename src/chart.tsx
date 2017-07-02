@@ -55,16 +55,15 @@ export default class Chart extends React.Component<CharProps, {}> {
             .x((d: Point) => x(d.time))
             .y((d: Point) => y(d.value))
 
-
         x.domain(d3.extent(this.props.line, (d: Point) => d.time) as number[])
         y.domain(d3.extent(this.props.line, (d: Point) => d.value) as number[])
 
+        // x axis
         g.append('g')
             .attr('transform', 'translate(0,' + height + ')')
             .call(d3.axisBottom(x))
-            .select('.domain')
-            .remove()
-
+        
+        // y axis
         g.append('g')
             .call(d3.axisLeft(y))
             .append('text')
@@ -75,7 +74,25 @@ export default class Chart extends React.Component<CharProps, {}> {
             .attr('text-anchor', 'end')
             .text('Blood Alcohol Content')
 
-        // line
+        // legal limit line
+        g.append('path')
+            .datum([{ time: 0, value: 0.08}, {time: 9999, value: 0.08}])
+            .attr('fill', 'none')
+            .attr('stroke', 'blue')
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-width', 1.5)
+            .attr('d', line)
+
+        // Dead line
+        g.append('path')
+            .datum([{ time: 0, value: 0.6}, {time: 9999, value: 0.6}])
+            .attr('fill', 'none')
+            .attr('stroke', 'red')
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-width', 1.5)
+            .attr('d', line)
+
+        // Line
         g.append('path')
             .datum(this.props.line)
             .attr('fill', 'none')
@@ -95,7 +112,7 @@ export default class Chart extends React.Component<CharProps, {}> {
             .style("opacity", 0.6)
 
         // hover
-        const focus = svg.append('g')
+        const focus = g.append('g')
             .attr('class', 'focus')
             .style('display', 'none');
 
@@ -123,7 +140,7 @@ export default class Chart extends React.Component<CharProps, {}> {
             const d0 = data[i - 1]
             const d1 = data[i]
             const d = x0 - d0.time > d1.time - x0 ? d1 : d0
-            focus.attr('transform', 'translate(' + (x(d.time) + margin.left) + ',' + (y(d.value) + margin.top) + ')')
+            focus.attr('transform', 'translate(' + x(d.time) + ',' + y(d.value)  + ')')
             focus.select('text').text(d.value)
         }
 

@@ -31,6 +31,7 @@ class Main extends React.Component<{}, MainState> {
 
     private onDrinkChange(newDrink: Drink): void {
         this.setState({ drink: newDrink })
+        console.log(newDrink.ozOfAlcohol)
     }
 
     private onSexChange(newSex: Sex): void {

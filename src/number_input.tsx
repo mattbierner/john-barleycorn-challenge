@@ -14,7 +14,7 @@ export default class NumberInput extends React.Component<NumberInputProps, {}> {
     private onChange(e: React.ChangeEvent<HTMLSelectElement>): void {
         const value = +e.target.value
         const rangedValue = Math.max(this.props.min, Math.min(this.props.max, value))
-        this.props.onChange(rangedValue)
+        this.props.onChange(value)
     }
 
     render() {

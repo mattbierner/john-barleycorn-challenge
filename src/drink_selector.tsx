@@ -11,7 +11,27 @@ export const drinks: Drink[] = [
     {
         value: '80_proof_whiskey_shot',
         label: 'a shot of 80 proof whiskey',
-        ozOfAlcohol: 1.5 * 0.4
+        ozOfAlcohol: 1.5 /*oz*/ * 0.4 /* % */
+    },
+    {
+        value: 'pint_beer',
+        label: 'a pint of beer',
+        ozOfAlcohol: 16 /*oz*/ * 0.05 /* % */
+    },
+    {
+        value: 'sip_wine',
+        label: 'a big sip of wine ',
+        ozOfAlcohol: 0.54 /*oz*/ * 0.10 /* % */
+    },
+    {
+        value: 'aquarium',
+        label: 'an aquarium of Pabst',
+        ozOfAlcohol: 128 /*oz*/ *  0.0474 /* % */
+    },
+      {
+        value: 'dry_martini',
+        label: 'a dry martini',
+        ozOfAlcohol: (1.5 /*oz*/ *  0.45 /* % */) + (1.5 /*oz*/ *  0.16 /* % */)
     }
 ];
 
