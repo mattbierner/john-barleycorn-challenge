@@ -14,3 +14,15 @@ body {
     max-height: 100vh;
     height: 100%;
 }
+
+
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.focus circle {
+  fill: none;
+  stroke: steelblue;
+}

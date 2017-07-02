@@ -63,7 +63,7 @@ class Main extends React.Component<{}, MainState> {
                     everytime 'John Barleycorn' appears in the text of 'John Barleycorn' at
                     <NumberInput 
                         min={5}
-                        max={400}
+                        max={1000}
                         value={this.state.wordsPerMinute}
                         onChange={this.onWpmChange.bind(this)} />
 

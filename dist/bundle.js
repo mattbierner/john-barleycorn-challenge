@@ -9869,7 +9869,7 @@ class Main extends React.Component {
                 "drinking",
                 React.createElement(drink_selector_1.DrinkSelector, { value: this.state.drink.value, onDrinkChange: this.onDrinkChange.bind(this) }),
                 "everytime 'John Barleycorn' appears in the text of 'John Barleycorn' at",
-                React.createElement(number_input_1.default, { min: 5, max: 400, value: this.state.wordsPerMinute, onChange: this.onWpmChange.bind(this) })),
+                React.createElement(number_input_1.default, { min: 5, max: 1000, value: this.state.wordsPerMinute, onChange: this.onWpmChange.bind(this) })),
             React.createElement(visualization_1.default, { bodyWeightKg: this.state.weightOfDrinker, precentWater: this.state.sexOfDrinker === 'male' ? 0.58 : 0.49, ouncesEtOH: this.state.drink.ozOfAlcohol, metabolicRate: 0.012, wordPerMinute: this.state.wordsPerMinute, totalWordCount: data['total_length'], barleycornIndicies: data['indicies'] })));
     }
 }
@@ -22559,6 +22559,7 @@ exports.default = Visualization;
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(22);
 const d3 = __webpack_require__(366);
+const bisectDate = d3.bisector((point) => point.time).left;
 class Chart extends React.Component {
     constructor() {
         super(...arguments);
@@ -22574,22 +22575,19 @@ class Chart extends React.Component {
     createBarChart() {
         if (!this.node)
             return;
-        // Extract the width and height that was computed by CSS.
-        var svgwidth = this.node.clientWidth;
-        var svgheight = this.node.clientHeight;
-        // Use the extracted size to set the size of an SVG element.
-        const svg = d3.select(this.node);
-        svg.selectAll("*").remove();
-        svg
-            .attr("viewBox", `0 0 ${svgwidth} ${svgheight}`);
+        const svgwidth = this.node.clientWidth;
+        const svgheight = this.node.clientHeight;
         const width = +svgwidth - this.margin.left - this.margin.right;
         const height = +svgheight - this.margin.top - this.margin.bottom;
+        const svg = d3.select(this.node);
+        svg.selectAll('*').remove();
+        svg.attr('viewBox', `0 0 ${svgwidth} ${svgheight}`);
         const g = svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
-        var x = d3.scaleLinear()
+        const x = d3.scaleLinear()
             .rangeRound([0, width]);
-        var y = d3.scaleLinear()
+        const y = d3.scaleLinear()
             .rangeRound([height, 0]);
-        var line = d3.line()
+        const line = d3.line()
             .x((d) => x(d.time))
             .y((d) => y(d.value));
         x.domain(d3.extent(this.props.data, (d) => d.time));
@@ -22616,6 +22614,33 @@ class Chart extends React.Component {
             .attr('stroke-linecap', 'round')
             .attr('stroke-width', 1.5)
             .attr('d', line);
+        var focus = svg.append('g')
+            .attr('class', 'focus')
+            .style('display', 'none');
+        focus.append('circle')
+            .attr('r', 4.5);
+        focus.append('text')
+            .attr('x', 9)
+            .attr('dy', '.35em');
+        svg.append('rect')
+            .attr('class', 'overlay')
+            .attr('fill', 'none')
+            .attr('width', width)
+            .attr('height', height)
+            .on('mouseover', () => { focus.style('display', null); })
+            .on('mouseout', () => { focus.style('display', 'none'); })
+            .on('mousemove', mousemove);
+        const margin = this.margin;
+        const data = this.props.data;
+        function mousemove() {
+            const x0 = x.invert(d3.mouse(this)[0]);
+            const i = bisectDate(data, x0, 1);
+            const d0 = data[i - 1];
+            const d1 = data[i];
+            const d = x0 - d0.time > d1.time - x0 ? d1 : d0;
+            focus.attr('transform', 'translate(' + (x(d.time) + margin.left) + ',' + (y(d.value) + margin.top) + ')');
+            focus.select('text').text(d.value);
+        }
     }
     render() {
         return (React.createElement("svg", { className: 'chart', preserveAspectRatio: 'xMinYMin meet', ref: node => this.node = node }));
