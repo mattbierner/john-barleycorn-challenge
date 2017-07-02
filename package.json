@@ -8,6 +8,7 @@
         "react-dom": "^15.6.1"
     },
     "devDependencies": {
+        "@types/d3": "^4.9.0",
         "@types/node": "^8.0.7",
         "@types/react": "^15.0.33",
         "@types/react-dom": "^15.5.1",

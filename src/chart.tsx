@@ -1,9 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-const { scaleLinear } = require('d3-scale')
-const { max } = require('d3-array')
-const { select } = require('d3-selection')
-const d3 = require('d3')
+import * as d3 from 'd3'
 
 export interface Point {
     time: number
@@ -30,37 +27,37 @@ export default class Chart extends React.Component<CharProps, {}> {
 
     private createBarChart(): void {
         if (!this.node)
-            return 
+            return
 
-   // Extract the width and height that was computed by CSS.
+        // Extract the width and height that was computed by CSS.
         var svgwidth = this.node.clientWidth;
         var svgheight = this.node.clientHeight;
 
         // Use the extracted size to set the size of an SVG element.
-      
 
-        const svg = select(this.node)
+
+        const svg = d3.select(this.node)
         svg.selectAll("*").remove();
-          svg
-          .attr("viewBox", `0 0 ${svgwidth} ${svgheight}`)
+        svg
+            .attr("viewBox", `0 0 ${svgwidth} ${svgheight}`)
 
-        const width = +svgwidth- this.margin.left - this.margin.right;
+        const width = +svgwidth - this.margin.left - this.margin.right;
         const height = +svgheight - this.margin.top - this.margin.bottom;
         const g = svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
 
         var x = d3.scaleLinear()
-            .rangeRound([0,width]);
+            .rangeRound([0, width]);
 
         var y = d3.scaleLinear()
             .rangeRound([height, 0]);
 
-        var line = d3.line()
+        var line = d3.line<Point>()
             .x((d: Point) => x(d.time))
             .y((d: Point) => y(d.value));
 
 
-        x.domain(d3.extent(this.props.data, (d: Point) => d.time));
-        y.domain(d3.extent(this.props.data, (d: Point) => d.value));
+        x.domain(d3.extent(this.props.data, (d: Point) => d.time) as number[]);
+        y.domain(d3.extent(this.props.data, (d: Point) => d.value)as number[]);
 
         g.append('g')
             .attr('transform', 'translate(0,' + height + ')')
