@@ -1,0 +1,18 @@
+#site-footer {
+    margin-top: 3em;
+    background: #d63434;
+    color: #f7f7f7;
+
+
+    font-size: 12px;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+#site-footer a {
+    color: #f7f7f7
+}
+
+#site-footer #copyright {
+    padding-top: 0.8em;
+}

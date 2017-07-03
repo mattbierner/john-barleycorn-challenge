@@ -9,6 +9,8 @@ export interface Point {
 
 const bisectDate = d3.bisector<Point, {}>((point: Point) => point.time).left
 
+const hoverLabel = (point: Point) =>
+    `${point.value.toPrecision(3)} BAC\nafter ${Math.round(point.time)} minutes`
 
 interface CharProps {
     line: Point[]
@@ -95,21 +97,21 @@ export default class Chart extends React.Component<CharProps, {}> {
         // Line
         g.append('path')
             .datum(this.props.line)
+            .attr('class', 'line')
             .attr('fill', 'none')
-            .attr('stroke', 'steelblue')
             .attr('stroke-linejoin', 'round')
             .attr('stroke-linecap', 'round')
             .attr('stroke-width', 1.5)
             .attr('d', line)
 
         // Points
-        g.selectAll("scatter-dots")
+        g.selectAll('scatter-dots')
             .data(this.props.points) 
-            .enter().append("svg:circle")
-            .attr("cy", (d) => y(d.value))
-            .attr("cx", (d, i) => x(this.props.points[i].time))
-            .attr("r", 2) 
-            .style("opacity", 0.6)
+            .enter().append('svg:circle')
+            .attr('class', 'dot')
+            .attr('cy', (d) => y(d.value))
+            .attr('cx', (d, i) => x(this.props.points[i].time))
+            .attr('r', 2) 
 
         // hover
         const focus = g.append('g')
@@ -132,7 +134,7 @@ export default class Chart extends React.Component<CharProps, {}> {
             .on('mouseout', () => { focus.style('display', 'none'); })
             .on('mousemove', mousemove);
 
-        const margin = this.margin;
+        const margin = this.margin
         const data = this.props.line
         function mousemove(this: any) {
             const x0 = x.invert(d3.mouse(this)[0] - margin.left)
@@ -141,16 +143,17 @@ export default class Chart extends React.Component<CharProps, {}> {
             const d1 = data[i]
             const d = x0 - d0.time > d1.time - x0 ? d1 : d0
             focus.attr('transform', 'translate(' + x(d.time) + ',' + y(d.value)  + ')')
-            focus.select('text').text(d.value)
+            focus.select('text').text(hoverLabel(d))
         }
-
     }
 
     render() {
         return (
-            <svg className='chart'
-                preserveAspectRatio='xMinYMin meet'
-                ref={node => this.node = node} />
+            <div className='chart'>
+                <svg
+                    preserveAspectRatio='xMinYMin meet'
+                    ref={node => this.node = node} />
+            </div>
         )
     }
 }

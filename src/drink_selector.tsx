@@ -14,14 +14,19 @@ export const drinks: Drink[] = [
         ozOfAlcohol: 1.5 /*oz*/ * 0.4 /* % */
     },
     {
+        value: 'draught_beer',
+        label: 'a draught of strong beer',
+        ozOfAlcohol: 1.0 /*oz*/ * 0.07 /* % */
+    },
+    {
         value: 'pint_beer',
-        label: 'a pint of beer',
+        label: 'a pint of normal beer',
         ozOfAlcohol: 16 /*oz*/ * 0.05 /* % */
     },
     {
         value: 'sip_wine',
-        label: 'a big sip of wine ',
-        ozOfAlcohol: 0.54 /*oz*/ * 0.10 /* % */
+        label: 'a big sip of wine',
+        ozOfAlcohol: 0.5 /*oz*/ * 0.10 /* % */
     },
     {
         value: 'aquarium',
@@ -32,7 +37,7 @@ export const drinks: Drink[] = [
         value: 'dry_martini',
         label: 'a dry martini',
         ozOfAlcohol: (1.5 /*oz*/ *  0.45 /* % */) + (1.5 /*oz*/ *  0.16 /* % */)
-    }
+    },
 ];
 
 interface DrinkSelectorProps {

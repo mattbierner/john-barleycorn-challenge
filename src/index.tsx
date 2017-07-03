@@ -44,31 +44,41 @@ class Main extends React.Component<{}, MainState> {
 
     private onWpmChange(newWpm: number): void {
         this.setState({ wordsPerMinute: newWpm })
-    } 
+    }
 
     render() {
         return (
-            <div>
-                <div>
-                    A
-                    <NumberInput
-                        min={1}
-                        max={500}
-                        value={this.state.weightOfDrinker}
-                        onChange={this.onWeightChange.bind(this)} />kg
-                    <SexSelector value={this.state.sexOfDrinker} onSexChange={this.onSexChange.bind(this)} />
-                    drinking
-                    <DrinkSelector
-                        value={this.state.drink.value}
-                        onDrinkChange={this.onDrinkChange.bind(this)} />
-                    everytime 'John Barleycorn' appears in the text of 'John Barleycorn' at
-                    <NumberInput 
-                        min={5}
-                        max={1000}
-                        value={this.state.wordsPerMinute}
-                        onChange={this.onWpmChange.bind(this)} />
+            <div className='content'>
+                <div style={{flex: 1}}>
+                    <header>
+                        <img src="images/logo.svg" alt="The John Barleycorn Challenge" />
+                        <nav>
+                            <a>About</a>
+                            <a>Source</a>
+                            <a>Post</a>
+                        </nav>
+                    </header>
 
+                    <div className='controls'>
+                        A <NumberInput
+                            min={5}
+                            max={500}
+                            value={this.state.weightOfDrinker}
+                            onChange={this.onWeightChange.bind(this)} />kg&nbsp;
+                    <SexSelector value={this.state.sexOfDrinker} onSexChange={this.onSexChange.bind(this)} /><br />
+                        reading <i>John Barleycorn</i><br /> at <NumberInput
+                            min={5}
+                            max={1000}
+                            value={this.state.wordsPerMinute}
+                            onChange={this.onWpmChange.bind(this)} /> WPM<br />
+                        and drinking
+                    <DrinkSelector
+                            value={this.state.drink.value}
+                            onDrinkChange={this.onDrinkChange.bind(this)} /><br />
+                        everytime "John Barleycorn" appears
+                    </div>
                 </div>
+
                 <Visualization
                     bodyWeightKg={this.state.weightOfDrinker}
                     precentWater={this.state.sexOfDrinker === 'male' ? 0.58 : 0.49}

@@ -10,10 +10,35 @@ interface NumberInputProps {
     onChange: (newValue: number) => void
 }
 
-export default class NumberInput extends React.Component<NumberInputProps, {}> {
+interface NumberInputState {
+    actualValue: number
+}
+
+export default class NumberInput extends React.Component<NumberInputProps, NumberInputState> {
+    constructor(props: NumberInputProps) {
+        super(props)
+        this.state = {
+            actualValue: props.value
+        }
+    }
+
+    componentWillReceiveProps(newProps: NumberInputProps) {
+        this.setState({ actualValue: newProps.value })
+    }
+
     private onChange(e: React.ChangeEvent<HTMLSelectElement>): void {
         const value = +e.target.value
-        const rangedValue = Math.max(this.props.min, Math.min(this.props.max, value))
+        if (isNaN(value))
+            return
+
+        this.setState({ actualValue: value })
+        
+        if (value < this.props.min)
+            return
+
+        if (value > this.props.max) 
+            return
+
         this.props.onChange(value)
     }
 
@@ -21,7 +46,7 @@ export default class NumberInput extends React.Component<NumberInputProps, {}> {
         return (
             <input
                 type='number'
-                value={this.props.value}
+                value={this.state.actualValue}
                 onChange={this.onChange.bind(this)}
                 min={this.props.min}
                 max={this.props.max} />
