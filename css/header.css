@@ -1,0 +1,13 @@
+header {
+    margin-bottom: 4em;
+}
+
+header nav {
+    display: flex;
+    justify-content: center;
+}
+
+header nav a {
+    display: block;
+    padding: 0 1em;
+}

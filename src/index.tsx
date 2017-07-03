@@ -53,9 +53,9 @@ class Main extends React.Component<{}, MainState> {
                     <header>
                         <img src="images/logo.svg" alt="The John Barleycorn Challenge" />
                         <nav>
-                            <a>About</a>
-                            <a>Source</a>
-                            <a>Post</a>
+                            <a href="http://github.com/mattbierner/john-barleycorn-challenge#readme">About</a>
+                            <a href="http://github.com/mattbierner/john-barleycorn-challenge">Source</a>
+                            <a href="https://blog.mattbierner.com/john-barleycorn">Post</a>
                         </nav>
                     </header>
 
