@@ -101,8 +101,8 @@ export default class Visualization extends React.Component<VisualizationProps, {
         return (
             <div className='chart'>
                 <Chart line={this.line} points={this.points} />
-                <div>
-                    <span>🍻 after {this.timeToIntoxication ? Math.round(this.timeToIntoxication) + ' minutes' : 'never'}</span>&nbsp;
+                <div className='stats'>
+                    <span>🍻 after {this.timeToIntoxication ? Math.round(this.timeToIntoxication) + ' minutes' : 'never'}</span>
                     <span>☠ after {this.timeToDeath ? Math.round(this.timeToDeath) + ' minutes' : 'never'}</span>
                 </div>
             </div>

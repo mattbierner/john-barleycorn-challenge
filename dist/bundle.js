@@ -22530,11 +22530,10 @@ class Visualization extends React.Component {
     render() {
         return (React.createElement("div", { className: 'chart' },
             React.createElement(chart_1.default, { line: this.line, points: this.points }),
-            React.createElement("div", null,
+            React.createElement("div", { className: 'stats' },
                 React.createElement("span", null,
                     "\uD83C\uDF7B after ",
                     this.timeToIntoxication ? Math.round(this.timeToIntoxication) + ' minutes' : 'never'),
-                "\u00A0",
                 React.createElement("span", null,
                     "\u2620 after ",
                     this.timeToDeath ? Math.round(this.timeToDeath) + ' minutes' : 'never'))));
