@@ -7,7 +7,7 @@
 # About
 *The John Barleycorn Challenge* is a playful look at Jack London's writing about alcoholism in his novel [*John Barleycorn*](https://www.gutenberg.org/ebooks/318). The project examines what would happen if one were to treat the text of *John Barleycorn* as a drinking game, taking a dose of alcohol every time the words "John Barleycorn" appear in the text. Spoiler alert: it usually does not end well.
 
-The site allows to configure the scenario in a few of different ways, including:
+The site allows your to configure a few different variables in the the scenario, including:
 
 - Reading rate
 - Reader weight and sex
