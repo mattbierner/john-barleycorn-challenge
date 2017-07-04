@@ -9792,7 +9792,7 @@ class Main extends React.Component {
     }
     render() {
         return (React.createElement("div", { className: 'content' },
-            React.createElement("div", { style: { flex: 1 } },
+            React.createElement("div", { className: 'left', style: { flex: 1 } },
                 React.createElement("header", null,
                     React.createElement("img", { src: "images/logo.svg", alt: "The John Barleycorn Challenge" }),
                     React.createElement("nav", null,

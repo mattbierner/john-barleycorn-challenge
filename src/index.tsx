@@ -49,7 +49,7 @@ class Main extends React.Component<{}, MainState> {
     render() {
         return (
             <div className='content'>
-                <div style={{ flex: 1 }}>
+                <div className='left' style={{ flex: 1 }}>
                     <header>
                         <img src="images/logo.svg" alt="The John Barleycorn Challenge" />
                         <nav>
