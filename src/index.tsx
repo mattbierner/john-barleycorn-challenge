@@ -72,7 +72,7 @@ class Main extends React.Component<{}, MainState> {
                             max={1000}
                             value={this.state.wordsPerMinute}
                             onChange={this.onWpmChange.bind(this)} /> WPM<br />
-                        taking
+                        taking {this.state.drink.value.match(/^[aeiou]/) ? 'an' : 'a'}
                     <DrinkSelector
                             value={this.state.drink.value}
                             onDrinkChange={this.onDrinkChange.bind(this)} /><br />

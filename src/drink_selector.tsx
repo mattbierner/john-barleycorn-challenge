@@ -10,32 +10,32 @@ export interface Drink {
 export const drinks: Drink[] = [
     {
         value: '80_proof_whiskey_shot',
-        label: 'a shot of 80 proof whiskey',
+        label: 'shot of 80 proof whiskey',
         ozOfAlcohol: 1.5 /*oz*/ * 0.4 /* % */
     },
     {
         value: 'draught_beer',
-        label: 'a draught of strong beer',
+        label: 'draught of strong beer',
         ozOfAlcohol: 1.0 /*oz*/ * 0.07 /* % */
     },
     {
         value: 'pint_beer',
-        label: 'a pint of normal beer',
+        label: 'pint of normal beer',
         ozOfAlcohol: 16 /*oz*/ * 0.05 /* % */
     },
     {
         value: 'sip_wine',
-        label: 'a big sip of wine',
+        label: 'big sip of wine',
         ozOfAlcohol: 0.5 /*oz*/ * 0.10 /* % */
     },
     {
         value: 'aquarium',
-        label: 'an aquarium of Pabst',
+        label: 'aquarium of Pabst',
         ozOfAlcohol: 128 /*oz*/ *  0.0474 /* % */
     },
       {
         value: 'dry_martini',
-        label: 'a dry martini',
+        label: 'dry martini',
         ozOfAlcohol: (1.5 /*oz*/ *  0.45 /* % */) + (1.5 /*oz*/ *  0.16 /* % */)
     },
 ];

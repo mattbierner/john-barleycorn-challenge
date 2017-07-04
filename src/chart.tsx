@@ -167,7 +167,6 @@ export default class Chart extends React.Component<CharProps, {}> {
                     .text(t)
             }
             focus.attr('text-anchor', d.time > x.domain()[1] / 2 ? 'end' : 'start')
-
         }
     }
 
