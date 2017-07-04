@@ -1,8 +1,10 @@
 .chart {
     flex: 1;
+
 }
 
 .chart svg {
+    display: block;
     width: 100%;
     max-width: 600px;
     height: 80vh;
@@ -19,11 +21,23 @@
     fill: #d63434;
 }
 
+.focus {
+    font-family: monospace;
+}
+
 .line {
-    stroke: #777;
+    stroke: #353535;
 }
 
 .dot {
     opacity: 0.6;
     color: #353535;
-} 
+}
+
+.legal-line path {
+    stroke: #777;
+}
+
+.dead-line path {
+    stroke: #d63434;
+}

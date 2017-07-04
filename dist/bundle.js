@@ -9774,7 +9774,7 @@ class Main extends React.Component {
             // Biologically we should probably default to female but Jack London was male so whatever
             sexOfDrinker: sex_selector_1.Sex.male,
             weightOfDrinker: 70,
-            wordsPerMinute: 200
+            wordsPerMinute: 100
         };
     }
     onDrinkChange(newDrink) {
@@ -9800,22 +9800,23 @@ class Main extends React.Component {
                         React.createElement("a", { href: "http://github.com/mattbierner/john-barleycorn-challenge" }, "Source"),
                         React.createElement("a", { href: "https://blog.mattbierner.com/john-barleycorn" }, "Post"))),
                 React.createElement("div", { className: 'controls' },
-                    "A ",
+                    "When happens when a",
+                    React.createElement("br", null),
                     React.createElement(number_input_1.default, { min: 5, max: 500, value: this.state.weightOfDrinker, onChange: this.onWeightChange.bind(this) }),
                     "kg\u00A0",
                     React.createElement(sex_selector_1.SexSelector, { value: this.state.sexOfDrinker, onSexChange: this.onSexChange.bind(this) }),
                     React.createElement("br", null),
-                    "reading ",
+                    "reads ",
                     React.createElement("i", null, "John Barleycorn"),
                     React.createElement("br", null),
                     " at ",
                     React.createElement(number_input_1.default, { min: 5, max: 1000, value: this.state.wordsPerMinute, onChange: this.onWpmChange.bind(this) }),
                     " WPM",
                     React.createElement("br", null),
-                    "and drinking",
+                    "taking",
                     React.createElement(drink_selector_1.DrinkSelector, { value: this.state.drink.value, onDrinkChange: this.onDrinkChange.bind(this) }),
                     React.createElement("br", null),
-                    "everytime \"John Barleycorn\" appears")),
+                    "every time \"John Barleycorn\" appears")),
             React.createElement(visualization_1.default, { bodyWeightKg: this.state.weightOfDrinker, precentWater: this.state.sexOfDrinker === 'male' ? 0.58 : 0.49, ouncesEtOH: this.state.drink.ozOfAlcohol, metabolicRate: 0.012, wordPerMinute: this.state.wordsPerMinute, totalWordCount: data['total_length'], barleycornIndicies: data['indicies'] })));
     }
 }
@@ -22477,7 +22478,7 @@ class Visualization extends React.Component {
             const start = i * (1.0 / this.props.wordPerMinute);
             total += this.computeBac((timeInMinutes - start) / 60.0);
         }
-        return total;
+        return Math.min(100, total);
     }
     get line() {
         const end = Math.ceil(this.props.totalWordCount / this.props.wordPerMinute);
@@ -22510,8 +22511,33 @@ class Visualization extends React.Component {
         out.push({ time: end, value: this.compute(end) });
         return out;
     }
+    get timeToIntoxication() {
+        for (const p of this.points) {
+            if (p.value > 0.08) {
+                return p.time;
+            }
+        }
+        return null;
+    }
+    get timeToDeath() {
+        for (const p of this.points) {
+            if (p.value > 0.6) {
+                return p.time;
+            }
+        }
+        return null;
+    }
     render() {
-        return (React.createElement(chart_1.default, { line: this.line, points: this.points }));
+        return (React.createElement("div", { className: 'chart' },
+            React.createElement(chart_1.default, { line: this.line, points: this.points }),
+            React.createElement("div", null,
+                React.createElement("span", null,
+                    "\uD83C\uDF7B after ",
+                    this.timeToIntoxication ? Math.round(this.timeToIntoxication) + ' minutes' : 'never'),
+                "\u00A0",
+                React.createElement("span", null,
+                    "\u2620 after ",
+                    this.timeToDeath ? Math.round(this.timeToDeath) + ' minutes' : 'never'))));
     }
 }
 exports.default = Visualization;
@@ -22527,11 +22553,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(16);
 const d3 = __webpack_require__(186);
 const bisectDate = d3.bisector((point) => point.time).left;
-const hoverLabel = (point) => `${point.value.toPrecision(3)} BAC\nafter ${Math.round(point.time)} minutes`;
+const hoverLabel = (point) => [`${point.value.toPrecision(3)} BAC`, `${point.time.toFixed(2)} min`];
 class Chart extends React.Component {
     constructor() {
         super(...arguments);
-        this.margin = { left: 40, top: 20, right: 20, bottom: 20 };
+        this.margin = { left: 40, top: 20, right: 20, bottom: 40 };
+        this.levelLines = [
+            {
+                class: 'legal-line',
+                title: '🍻',
+                value: 0.08
+            }, {
+                class: 'dead-line',
+                title: '☠',
+                value: 0.6
+            }
+        ];
     }
     componentDidMount() {
         this.createBarChart();
@@ -22563,7 +22600,14 @@ class Chart extends React.Component {
         // x axis
         g.append('g')
             .attr('transform', 'translate(0,' + height + ')')
-            .call(d3.axisBottom(x));
+            .call(d3.axisBottom(x))
+            .append('text')
+            .attr('fill', '#000')
+            .attr('y', 6)
+            .attr('dy', '2.4em')
+            .attr('dx', (width / 2) + 'px')
+            .attr('text-anchor', 'middle')
+            .text('Time elapsed (min)');
         // y axis
         g.append('g')
             .call(d3.axisLeft(y))
@@ -22571,25 +22615,25 @@ class Chart extends React.Component {
             .attr('fill', '#000')
             .attr('transform', 'rotate(-90)')
             .attr('y', 6)
-            .attr('dy', '0.71em')
+            .attr('dy', '0.70em')
             .attr('text-anchor', 'end')
             .text('Blood Alcohol Content');
-        // legal limit line
-        g.append('path')
-            .datum([{ time: 0, value: 0.08 }, { time: 9999, value: 0.08 }])
-            .attr('fill', 'none')
-            .attr('stroke', 'blue')
-            .attr('stroke-linejoin', 'round')
-            .attr('stroke-width', 1.5)
-            .attr('d', line);
-        // Dead line
-        g.append('path')
-            .datum([{ time: 0, value: 0.6 }, { time: 9999, value: 0.6 }])
-            .attr('fill', 'none')
-            .attr('stroke', 'red')
-            .attr('stroke-linejoin', 'round')
-            .attr('stroke-width', 1.5)
-            .attr('d', line);
+        // limit lines
+        for (const levelLine of this.levelLines) {
+            const lineG = g.append('g').attr('class', levelLine.class);
+            lineG.append('path')
+                .datum([{ time: 0, value: levelLine.value }, { time: 50000, value: levelLine.value }])
+                .attr('fill', 'none')
+                .attr('stroke-linejoin', 'round')
+                .attr('stroke-width', 1.5)
+                .attr('d', line);
+            lineG.append('text')
+                .attr('fill', '#000')
+                .attr('x', width)
+                .attr('y', y(levelLine.value))
+                .attr('dy', '-0.4em')
+                .text(levelLine.title);
+        }
         // Line
         g.append('path')
             .datum(this.props.line)
@@ -22613,14 +22657,14 @@ class Chart extends React.Component {
             .style('display', 'none');
         focus.append('circle')
             .attr('r', 4.5);
-        focus.append('text')
-            .attr('x', 9)
-            .attr('dy', '.35em');
+        focus.append('text');
         svg.append('rect')
             .attr('class', 'overlay')
             .attr('fill', 'none')
             .attr('width', width)
             .attr('height', height)
+            .attr('x', this.margin.left)
+            .attr('y', this.margin.top)
             .on('mouseover', () => { focus.style('display', null); })
             .on('mouseout', () => { focus.style('display', 'none'); })
             .on('mousemove', mousemove);
@@ -22633,12 +22677,20 @@ class Chart extends React.Component {
             const d1 = data[i];
             const d = x0 - d0.time > d1.time - x0 ? d1 : d0;
             focus.attr('transform', 'translate(' + x(d.time) + ',' + y(d.value) + ')');
-            focus.select('text').text(hoverLabel(d));
+            focus.select('text').selectAll('*').remove();
+            let g = 0;
+            for (const t of hoverLabel(d)) {
+                focus.select('text')
+                    .append('tspan')
+                    .attr('x', d.time > x.domain()[1] / 2 ? -10 : 10)
+                    .attr('y', (g++ * 1.4) + 'em')
+                    .text(t);
+            }
+            focus.attr('text-anchor', d.time > x.domain()[1] / 2 ? 'end' : 'start');
         }
     }
     render() {
-        return (React.createElement("div", { className: 'chart' },
-            React.createElement("svg", { preserveAspectRatio: 'xMinYMin meet', ref: node => this.node = node })));
+        return (React.createElement("svg", { preserveAspectRatio: 'xMinYMin meet', ref: node => this.node = node }));
     }
 }
 exports.default = Chart;

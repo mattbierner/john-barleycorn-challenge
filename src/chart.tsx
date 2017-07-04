@@ -2,6 +2,12 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import * as d3 from 'd3'
 
+interface LevelLine {
+    title: string
+    class: string
+    value: number
+}
+
 export interface Point {
     time: number
     value: number
@@ -10,7 +16,7 @@ export interface Point {
 const bisectDate = d3.bisector<Point, {}>((point: Point) => point.time).left
 
 const hoverLabel = (point: Point) =>
-    `${point.value.toPrecision(3)} BAC\nafter ${Math.round(point.time)} minutes`
+    [`${point.value.toPrecision(3)} BAC`, `${point.time.toFixed(2)} min`]
 
 interface CharProps {
     line: Point[]
@@ -19,12 +25,23 @@ interface CharProps {
 
 export default class Chart extends React.Component<CharProps, {}> {
     private node: SVGSVGElement | null
-    private margin = { left: 40, top: 20, right: 20, bottom: 20 }
+    private margin = { left: 40, top: 20, right: 20, bottom: 40 }
+
+    private levelLines: LevelLine[] = [
+        {
+            class: 'legal-line',
+            title: '🍻',
+            value: 0.08
+        }, {
+            class: 'dead-line',
+            title: '☠',
+            value: 0.6
+        }
+    ]
 
     componentDidMount() {
         this.createBarChart()
         d3.select(window).on('resize', () => this.createBarChart())
-
     }
 
     componentDidUpdate() {
@@ -64,7 +81,14 @@ export default class Chart extends React.Component<CharProps, {}> {
         g.append('g')
             .attr('transform', 'translate(0,' + height + ')')
             .call(d3.axisBottom(x))
-        
+            .append('text')
+            .attr('fill', '#000')
+            .attr('y', 6)
+            .attr('dy', '2.4em')
+            .attr('dx', (width / 2) + 'px')
+            .attr('text-anchor', 'middle')
+            .text('Time elapsed (min)')
+
         // y axis
         g.append('g')
             .call(d3.axisLeft(y))
@@ -72,27 +96,28 @@ export default class Chart extends React.Component<CharProps, {}> {
             .attr('fill', '#000')
             .attr('transform', 'rotate(-90)')
             .attr('y', 6)
-            .attr('dy', '0.71em')
+            .attr('dy', '0.70em')
             .attr('text-anchor', 'end')
             .text('Blood Alcohol Content')
 
-        // legal limit line
-        g.append('path')
-            .datum([{ time: 0, value: 0.08}, {time: 9999, value: 0.08}])
-            .attr('fill', 'none')
-            .attr('stroke', 'blue')
-            .attr('stroke-linejoin', 'round')
-            .attr('stroke-width', 1.5)
-            .attr('d', line)
+        // limit lines
+        for (const levelLine of this.levelLines) {
+            const lineG = g.append('g').attr('class', levelLine.class)
 
-        // Dead line
-        g.append('path')
-            .datum([{ time: 0, value: 0.6}, {time: 9999, value: 0.6}])
-            .attr('fill', 'none')
-            .attr('stroke', 'red')
-            .attr('stroke-linejoin', 'round')
-            .attr('stroke-width', 1.5)
-            .attr('d', line)
+            lineG.append('path')
+                .datum([{ time: 0, value: levelLine.value }, { time: 50000, value: levelLine.value }])
+                .attr('fill', 'none')
+                .attr('stroke-linejoin', 'round')
+                .attr('stroke-width', 1.5)
+                .attr('d', line);
+
+            lineG.append('text')
+                .attr('fill', '#000')
+                .attr('x', width)
+                .attr('y', y(levelLine.value))
+                .attr('dy', '-0.4em')
+                .text(levelLine.title)
+        }
 
         // Line
         g.append('path')
@@ -106,30 +131,30 @@ export default class Chart extends React.Component<CharProps, {}> {
 
         // Points
         g.selectAll('scatter-dots')
-            .data(this.props.points) 
+            .data(this.props.points)
             .enter().append('svg:circle')
             .attr('class', 'dot')
             .attr('cy', (d) => y(d.value))
             .attr('cx', (d, i) => x(this.props.points[i].time))
-            .attr('r', 2) 
+            .attr('r', 2)
 
         // hover
         const focus = g.append('g')
             .attr('class', 'focus')
-            .style('display', 'none');
+            .style('display', 'none')
 
         focus.append('circle')
-            .attr('r', 4.5);
+            .attr('r', 4.5)
 
         focus.append('text')
-            .attr('x', 9)
-            .attr('dy', '.35em');
 
         svg.append('rect')
             .attr('class', 'overlay')
             .attr('fill', 'none')
             .attr('width', width)
             .attr('height', height)
+            .attr('x', this.margin.left)
+            .attr('y', this.margin.top)
             .on('mouseover', () => { focus.style('display', null); })
             .on('mouseout', () => { focus.style('display', 'none'); })
             .on('mousemove', mousemove);
@@ -142,18 +167,26 @@ export default class Chart extends React.Component<CharProps, {}> {
             const d0 = data[i - 1]
             const d1 = data[i]
             const d = x0 - d0.time > d1.time - x0 ? d1 : d0
-            focus.attr('transform', 'translate(' + x(d.time) + ',' + y(d.value)  + ')')
-            focus.select('text').text(hoverLabel(d))
+            focus.attr('transform', 'translate(' + x(d.time) + ',' + y(d.value) + ')')
+            focus.select('text').selectAll('*').remove()
+            let g = 0
+            for (const t of hoverLabel(d)) {
+                focus.select('text')
+                    .append('tspan')
+                    .attr('x', d.time > x.domain()[1] / 2 ? -10 : 10)
+                    .attr('y', (g++ * 1.4) + 'em')
+                    .text(t)
+            }
+            focus.attr('text-anchor', d.time > x.domain()[1] / 2 ? 'end' : 'start')
+
         }
     }
 
     render() {
         return (
-            <div className='chart'>
-                <svg
-                    preserveAspectRatio='xMinYMin meet'
-                    ref={node => this.node = node} />
-            </div>
+            <svg
+                preserveAspectRatio='xMinYMin meet'
+                ref={node => this.node = node} />
         )
     }
 }

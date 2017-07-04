@@ -1,16 +1,15 @@
 #site-footer {
-    margin-top: 3em;
     background: #d63434;
-    color: #f7f7f7;
-
+    color: rgba(255, 255, 255, 0.6);
 
     font-size: 12px;
     padding-top: 1em;
     padding-bottom: 1em;
+    margin-top: 6em;
 }
 
 #site-footer a {
-    color: #f7f7f7
+    color: rgba(255, 255, 255, 0.6)
 }
 
 #site-footer #copyright {

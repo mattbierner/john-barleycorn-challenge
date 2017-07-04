@@ -17,7 +17,6 @@ interface VisualizationProps {
 }
 
 export default class Visualization extends React.Component<VisualizationProps, {}> {
-
     private computeBac(timeInHours: number): number {
         const bodyWaterML = this.props.bodyWeightKg * this.props.precentWater * 1000
         const concEtOHinWater = gramsPerOzEtOH * this.props.ouncesEtOH / bodyWaterML
@@ -36,12 +35,12 @@ export default class Visualization extends React.Component<VisualizationProps, {
             const start = i * (1.0 / this.props.wordPerMinute)
             total += this.computeBac((timeInMinutes - start) / 60.0)
         }
-        return total
+        return Math.min(100, total)
     }
 
     private get line(): Point[] {
         const end = Math.ceil(this.props.totalWordCount / this.props.wordPerMinute)
-        
+
         const out: Point[] = []
         out.push({ time: 0, value: 0 })
 
@@ -53,10 +52,10 @@ export default class Visualization extends React.Component<VisualizationProps, {
             const next = this.props.barleycornIndicies[i + 1]
             if (!next)
                 break;
-            
+
             const nextStart = next * (1.0 / this.props.wordPerMinute)
             for (let forwardStart = start + 1; forwardStart < nextStart - 1; ++forwardStart) {
-                out.push({ time: forwardStart, value: this.compute(forwardStart)})
+                out.push({ time: forwardStart, value: this.compute(forwardStart) })
             }
         }
         out.push({ time: end, value: this.compute(end) })
@@ -80,9 +79,33 @@ export default class Visualization extends React.Component<VisualizationProps, {
         return out
     }
 
+    private get timeToIntoxication(): number | null {
+        for (const p of this.points) {
+            if (p.value > 0.08) {
+               return p.time
+            }
+        }
+        return null
+    }
+
+    private get timeToDeath(): number | null {
+        for (const p of this.points) {
+            if (p.value > 0.6) {
+               return p.time
+            }
+        }
+        return null
+    }
+
     render() {
         return (
-            <Chart line={this.line} points={this.points} />
+            <div className='chart'>
+                <Chart line={this.line} points={this.points} />
+                <div>
+                    <span>🍻 after {this.timeToIntoxication ? Math.round(this.timeToIntoxication) + ' minutes' : 'never'}</span>&nbsp;
+                    <span>☠ after {this.timeToDeath ? Math.round(this.timeToDeath) + ' minutes' : 'never'}</span>
+                </div>
+            </div>
         )
     }
 }

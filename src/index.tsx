@@ -25,7 +25,7 @@ class Main extends React.Component<{}, MainState> {
             // Biologically we should probably default to female but Jack London was male so whatever
             sexOfDrinker: Sex.male,
             weightOfDrinker: 70, // kg
-            wordsPerMinute: 200
+            wordsPerMinute: 100
         }
     }
 
@@ -49,7 +49,7 @@ class Main extends React.Component<{}, MainState> {
     render() {
         return (
             <div className='content'>
-                <div style={{flex: 1}}>
+                <div style={{ flex: 1 }}>
                     <header>
                         <img src="images/logo.svg" alt="The John Barleycorn Challenge" />
                         <nav>
@@ -60,22 +60,23 @@ class Main extends React.Component<{}, MainState> {
                     </header>
 
                     <div className='controls'>
-                        A <NumberInput
+                        When happens when a<br />
+                        <NumberInput
                             min={5}
                             max={500}
                             value={this.state.weightOfDrinker}
                             onChange={this.onWeightChange.bind(this)} />kg&nbsp;
                     <SexSelector value={this.state.sexOfDrinker} onSexChange={this.onSexChange.bind(this)} /><br />
-                        reading <i>John Barleycorn</i><br /> at <NumberInput
+                        reads <i>John Barleycorn</i><br /> at <NumberInput
                             min={5}
                             max={1000}
                             value={this.state.wordsPerMinute}
                             onChange={this.onWpmChange.bind(this)} /> WPM<br />
-                        and drinking
+                        taking
                     <DrinkSelector
                             value={this.state.drink.value}
                             onDrinkChange={this.onDrinkChange.bind(this)} /><br />
-                        everytime "John Barleycorn" appears
+                        every time "John Barleycorn" appears
                     </div>
                 </div>
 
