@@ -9800,7 +9800,7 @@ class Main extends React.Component {
                         React.createElement("a", { href: "http://github.com/mattbierner/john-barleycorn-challenge" }, "Source"),
                         React.createElement("a", { href: "https://blog.mattbierner.com/john-barleycorn" }, "Post"))),
                 React.createElement("div", { className: 'controls' },
-                    "When happens when a",
+                    "What happens when a",
                     React.createElement("br", null),
                     React.createElement(number_input_1.default, { min: 5, max: 500, value: this.state.weightOfDrinker, onChange: this.onWeightChange.bind(this) }),
                     "kg\u00A0",

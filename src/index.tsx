@@ -60,7 +60,7 @@ class Main extends React.Component<{}, MainState> {
                     </header>
 
                     <div className='controls'>
-                        When happens when a<br />
+                        What happens when a<br />
                         <NumberInput
                             min={5}
                             max={500}
