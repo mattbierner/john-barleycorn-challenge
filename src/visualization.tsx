@@ -111,7 +111,7 @@ export default class Visualization extends React.Component<VisualizationProps, {
     private get timeToIntoxication(): number | null {
         for (const p of this.points) {
             if (p.value > legalLimitBac) {
-               return p.time
+                return p.time
             }
         }
         return null
@@ -120,7 +120,7 @@ export default class Visualization extends React.Component<VisualizationProps, {
     private get timeToDeath(): number | null {
         for (const p of this.points) {
             if (p.value > deathBac) {
-               return p.time
+                return p.time
             }
         }
         return null
@@ -131,8 +131,8 @@ export default class Visualization extends React.Component<VisualizationProps, {
             <div className='chart'>
                 <Chart line={this.line} points={this.points} levelLines={this.levelLines} />
                 <div className='stats'>
-                    <span>🍻 after {this.timeToIntoxication ? Math.round(this.timeToIntoxication) + ' minutes' : 'never'}</span>
-                    <span>☠ after {this.timeToDeath ? Math.round(this.timeToDeath) + ' minutes' : 'never'}</span>
+                    {this.timeToIntoxication ? <span title='Intoxication'>🍻 after {Math.round(this.timeToIntoxication)} minutes</span> : ''}
+                    {this.timeToDeath ? <span title='Death'>☠ after {Math.round(this.timeToDeath)}  minutes</span> : ''}
                 </div>
             </div>
         )

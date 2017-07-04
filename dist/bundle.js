@@ -22560,12 +22560,14 @@ class Visualization extends React.Component {
         return (React.createElement("div", { className: 'chart' },
             React.createElement(chart_1.default, { line: this.line, points: this.points, levelLines: this.levelLines }),
             React.createElement("div", { className: 'stats' },
-                React.createElement("span", null,
+                this.timeToIntoxication ? React.createElement("span", { title: 'Intoxication' },
                     "\uD83C\uDF7B after ",
-                    this.timeToIntoxication ? Math.round(this.timeToIntoxication) + ' minutes' : 'never'),
-                React.createElement("span", null,
+                    Math.round(this.timeToIntoxication),
+                    " minutes") : '',
+                this.timeToDeath ? React.createElement("span", { title: 'Death' },
                     "\u2620 after ",
-                    this.timeToDeath ? Math.round(this.timeToDeath) + ' minutes' : 'never'))));
+                    Math.round(this.timeToDeath),
+                    "  minutes") : '')));
     }
 }
 exports.default = Visualization;
