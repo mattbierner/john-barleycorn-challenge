@@ -22460,7 +22460,30 @@ const React = __webpack_require__(16);
 const chart_1 = __webpack_require__(185);
 const gramsPerOzEtOH = 23.36;
 const bloodWaterPercentage = 0.806;
+const legalLimitBac = 0.08;
+const deathBac = 0.6;
 class Visualization extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.levelLines = [
+            {
+                class: 'legal-line',
+                title: '🍻',
+                value: legalLimitBac
+            }, {
+                class: 'dead-line',
+                title: '☠',
+                value: deathBac
+            }
+        ];
+    }
+    /**
+     * Compute blood alcohol content for a single intake of alchol
+     *
+     * Based on https://web.archive.org/web/20040202204141/www.nhtsa.dot.gov/people/injury/alcohol/bacreport.html
+     *
+     * @param timeInHours Time since drink was taken
+     */
     computeBac(timeInHours) {
         const bodyWaterML = this.props.bodyWeightKg * this.props.precentWater * 1000;
         const concEtOHinWater = gramsPerOzEtOH * this.props.ouncesEtOH / bodyWaterML;
@@ -22469,6 +22492,11 @@ class Visualization extends React.Component {
         const bac = gramPercentEtOHinBlood - (this.props.metabolicRate * timeInHours);
         return Math.max(0, bac);
     }
+    /**
+     * Compute total blood alchol content
+     *
+     * @param timeInMinutes Time since drinking began
+     */
     compute(timeInMinutes) {
         let total = 0;
         const offset = timeInMinutes * this.props.wordPerMinute;
@@ -22491,6 +22519,7 @@ class Visualization extends React.Component {
             const next = this.props.barleycornIndicies[i + 1];
             if (!next)
                 break;
+            // Get additional samples at one minute intervals between points
             const nextStart = next * (1.0 / this.props.wordPerMinute);
             for (let forwardStart = start + 1; forwardStart < nextStart - 1; ++forwardStart) {
                 out.push({ time: forwardStart, value: this.compute(forwardStart) });
@@ -22513,7 +22542,7 @@ class Visualization extends React.Component {
     }
     get timeToIntoxication() {
         for (const p of this.points) {
-            if (p.value > 0.08) {
+            if (p.value > legalLimitBac) {
                 return p.time;
             }
         }
@@ -22521,7 +22550,7 @@ class Visualization extends React.Component {
     }
     get timeToDeath() {
         for (const p of this.points) {
-            if (p.value > 0.6) {
+            if (p.value > deathBac) {
                 return p.time;
             }
         }
@@ -22529,7 +22558,7 @@ class Visualization extends React.Component {
     }
     render() {
         return (React.createElement("div", { className: 'chart' },
-            React.createElement(chart_1.default, { line: this.line, points: this.points }),
+            React.createElement(chart_1.default, { line: this.line, points: this.points, levelLines: this.levelLines }),
             React.createElement("div", { className: 'stats' },
                 React.createElement("span", null,
                     "\uD83C\uDF7B after ",
@@ -22557,17 +22586,6 @@ class Chart extends React.Component {
     constructor() {
         super(...arguments);
         this.margin = { left: 40, top: 20, right: 20, bottom: 40 };
-        this.levelLines = [
-            {
-                class: 'legal-line',
-                title: '🍻',
-                value: 0.08
-            }, {
-                class: 'dead-line',
-                title: '☠',
-                value: 0.6
-            }
-        ];
     }
     componentDidMount() {
         this.createBarChart();
@@ -22618,7 +22636,7 @@ class Chart extends React.Component {
             .attr('text-anchor', 'end')
             .text('Blood Alcohol Content');
         // limit lines
-        for (const levelLine of this.levelLines) {
+        for (const levelLine of this.props.levelLines) {
             const lineG = g.append('g').attr('class', levelLine.class);
             lineG.append('path')
                 .datum([{ time: 0, value: levelLine.value }, { time: 50000, value: levelLine.value }])

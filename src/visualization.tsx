@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import Chart, { Point } from './chart'
+import Chart, { Point, LevelLine } from './chart'
 
 const gramsPerOzEtOH = 23.36
 const bloodWaterPercentage = 0.806
@@ -16,7 +16,30 @@ interface VisualizationProps {
     barleycornIndicies: number[]
 }
 
+const legalLimitBac = 0.08
+const deathBac = 0.6
+
+
 export default class Visualization extends React.Component<VisualizationProps, {}> {
+    private levelLines: LevelLine[] = [
+        {
+            class: 'legal-line',
+            title: '🍻',
+            value: legalLimitBac
+        }, {
+            class: 'dead-line',
+            title: '☠',
+            value: deathBac
+        }
+    ]
+
+    /**
+     * Compute blood alcohol content for a single intake of alchol
+     * 
+     * Based on https://web.archive.org/web/20040202204141/www.nhtsa.dot.gov/people/injury/alcohol/bacreport.html
+     * 
+     * @param timeInHours Time since drink was taken
+     */
     private computeBac(timeInHours: number): number {
         const bodyWaterML = this.props.bodyWeightKg * this.props.precentWater * 1000
         const concEtOHinWater = gramsPerOzEtOH * this.props.ouncesEtOH / bodyWaterML
@@ -26,6 +49,11 @@ export default class Visualization extends React.Component<VisualizationProps, {
         return Math.max(0, bac)
     }
 
+    /**
+     * Compute total blood alchol content
+     * 
+     * @param timeInMinutes Time since drinking began
+     */
     private compute(timeInMinutes: number): number {
         let total = 0
         const offset = timeInMinutes * this.props.wordPerMinute
@@ -53,6 +81,7 @@ export default class Visualization extends React.Component<VisualizationProps, {
             if (!next)
                 break;
 
+            // Get additional samples at one minute intervals between points
             const nextStart = next * (1.0 / this.props.wordPerMinute)
             for (let forwardStart = start + 1; forwardStart < nextStart - 1; ++forwardStart) {
                 out.push({ time: forwardStart, value: this.compute(forwardStart) })
@@ -81,7 +110,7 @@ export default class Visualization extends React.Component<VisualizationProps, {
 
     private get timeToIntoxication(): number | null {
         for (const p of this.points) {
-            if (p.value > 0.08) {
+            if (p.value > legalLimitBac) {
                return p.time
             }
         }
@@ -90,7 +119,7 @@ export default class Visualization extends React.Component<VisualizationProps, {
 
     private get timeToDeath(): number | null {
         for (const p of this.points) {
-            if (p.value > 0.6) {
+            if (p.value > deathBac) {
                return p.time
             }
         }
@@ -100,7 +129,7 @@ export default class Visualization extends React.Component<VisualizationProps, {
     render() {
         return (
             <div className='chart'>
-                <Chart line={this.line} points={this.points} />
+                <Chart line={this.line} points={this.points} levelLines={this.levelLines} />
                 <div className='stats'>
                     <span>🍻 after {this.timeToIntoxication ? Math.round(this.timeToIntoxication) + ' minutes' : 'never'}</span>
                     <span>☠ after {this.timeToDeath ? Math.round(this.timeToDeath) + ' minutes' : 'never'}</span>

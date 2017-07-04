@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import * as d3 from 'd3'
 
-interface LevelLine {
+export interface LevelLine {
     title: string
     class: string
     value: number
@@ -21,23 +21,12 @@ const hoverLabel = (point: Point) =>
 interface CharProps {
     line: Point[]
     points: Point[]
+    levelLines: LevelLine[]
 }
 
 export default class Chart extends React.Component<CharProps, {}> {
     private node: SVGSVGElement | null
     private margin = { left: 40, top: 20, right: 20, bottom: 40 }
-
-    private levelLines: LevelLine[] = [
-        {
-            class: 'legal-line',
-            title: '🍻',
-            value: 0.08
-        }, {
-            class: 'dead-line',
-            title: '☠',
-            value: 0.6
-        }
-    ]
 
     componentDidMount() {
         this.createBarChart()
@@ -101,7 +90,7 @@ export default class Chart extends React.Component<CharProps, {}> {
             .text('Blood Alcohol Content')
 
         // limit lines
-        for (const levelLine of this.levelLines) {
+        for (const levelLine of this.props.levelLines) {
             const lineG = g.append('g').attr('class', levelLine.class)
 
             lineG.append('path')
